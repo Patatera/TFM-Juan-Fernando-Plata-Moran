@@ -222,7 +222,7 @@ mutate(porc = 100 * n / sum(n))
 
 ggplot(HF, aes(x = edad, color = mortalidad, fill = mortalidad)) +
   geom_histogram(alpha = 0.8) +
-  labs(title = "Diagrama variable Edad", x = "Edad", y = "Frecuencia") + 
+  labs(title = "Histograma variable Edad", x = "Edad", y = "Frecuencia") + 
   theme_minimal()
 
 
@@ -241,7 +241,7 @@ HF |>
 count(sexo, sort = TRUE) |> 
 mutate(porc = 100 * n / sum(n), cumul = cumsum(porc))
 
-## Porcentaje de la variable objetivo agrupando la variable "edad":
+## Porcentaje de la variable objetivo agrupando la variable "sexo":
 
 HF |> 
 group_by(sexo) |> 
@@ -249,7 +249,7 @@ count(mortalidad) |>
 mutate(porc = 100 * n / sum(n))
 
 
-# Gráfico para la variable "edad":
+# Gráfico para la variable "sexo":
 
 ggplot(HF, aes(x = sexo, color = mortalidad, fill = mortalidad)) +
   geom_bar(alpha = 0.8) +
@@ -347,7 +347,7 @@ mutate(porc = 100 * n / sum(n))
 
 ggplot(HF, aes(x = presion_arterial_sistolica, color = mortalidad, fill = mortalidad)) +
   geom_histogram(alpha = 0.8) +
-  labs(title = "Diagrama variable Presion_arterial_sistolica", x = "Presion_arterial_sistolica", 
+  labs(title = "Histograma variable Presion_arterial_sistolica", x = "Presion_arterial_sistolica", 
   y = "Frecuencia") + 
   theme_minimal()
 
@@ -357,7 +357,7 @@ ggplot(HF, aes(x = presion_arterial_sistolica, color = mortalidad, fill = mortal
 
 La **variable "presion_arterial_sistolica"** consta de 123 valores distintos.   
 
-Aunque los valores de presión arterial sistólica varían en función de edad, el rango normal en adultos sanos se considera, generalmente, entre 90 y 130 mmHg. En las etapas iniciales de la insuficiencia cardíaca, la presión arterial sistólica puede estar dentro del rango normal o ligeramente elevada. Sin embargo, a medida que la enfermedad progresa y el corazón se debilita, la presión arterial sistólica tiende a disminuir.  
+Aunque los valores de presión arterial sistólica varían en función de la edad, el rango normal en adultos sanos se considera, generalmente, entre 90 y 130 mmHg. En las etapas iniciales de la insuficiencia cardíaca, la presión arterial sistólica puede estar dentro del rango normal o ligeramente elevada. Sin embargo, a medida que la enfermedad progresa y el corazón se debilita, la presión arterial sistólica tiende a disminuir.  
 
 Podemos observar que gran parte de los pacientes registrados han sobrepasado este límite, lo cual es lógico al haber sufrido un episodio de insuficiencia cardíaca.  
 
@@ -1095,7 +1095,7 @@ cor_matrix
 ## Se obtiene un gráfico de correlación:
 
 cor_matrix |> 
-corrplot(method = "number", tl.cex = 0.55, number.cex = 0.7, type = "lower")
+corrplot(method = "number", tl.cex = 0.9, number.cex = 0.9, type = "lower")
 
 
 ```
@@ -1483,21 +1483,6 @@ Este método BIC repetido 2 selecciona 3 variables:
 "edad", "creatinina", "presion_arterial_sistolica".   
 
 
-Si presentamos **todos los resultados en una tabla**:
-
-```{r eval = TRUE}
-# Tabla con todos los métodos de selección de variables:
-
-tabla <- as_tibble(cbind(Metodo = c("SBF", "RFE", "AIC", "BIC", "Boruta", "MMPC", "SES", "AICrep", "BICrep",        "BICrep 2"), Num_variables = c(length(variables_sbf), 8, length(variables_aic) - 1, length(variables_bic) - 1,
-  length(variables_boruta), length(variables_mmpc), length(variables_ses), length(variables_aic_rep),
-  length(variables_bic_rep), length(variables_bic_rep2)), Variables = c("")))
-
-tabla
-
-
-```
-
-
 ## 6: Comparación de modelos.
 
 Con cada método de selección de variables se obtiene un modelo. Se comparan estos modelos para ver cuál es el más adecuado mediante validación cruzada repetida. Los resultados se reflejan en el boxplot siguiente:   
@@ -1514,72 +1499,62 @@ detach("package:Boruta")
 modelo_logistica_sbf <- cruzadalogistica(data = as.data.frame(HF_prep), vardep = "mortalidad", listconti = c("edad",        "presion_arterial_sistolica", "presion_arterial_diastolica", "creatinina", "sodio", "potasio", "hemoglobina",             "crepitantes_no", "edemas_no", "inhibidores_ECA_si", "betabloqueadores_si"), listclass = c(""), grupos = 4,
   sinicio = 1234, repe = 10)
 
-modelo_logistica_sbf$modelo = "Logística (SBF)"
+modelo_logistica_sbf$modelo = "logist_sbf"
 
 ## Modelo Logística (RFE):
 
 modelo_logistica_rfe <- cruzadalogistica(data = as.data.frame(HF_prep), vardep = "mortalidad", listconti = c("edad",        "creatinina", "presion_arterial_sistolica", "presion_arterial_diastolica", "sodio", "betabloqueadores_si",                "hemoglobina", "anticoagulantes_orales_si"), listclass = c(""), grupos = 4, sinicio = 1234, repe = 10)
 
-modelo_logistica_rfe$modelo = "Logística (RFE)"
+modelo_logistica_rfe$modelo = "logist_rfe"
 
 ## Modelo Logística (AIC):
 
 modelo_logistica_aic <- cruzadalogistica(data = as.data.frame(HF_prep), vardep = "mortalidad", listconti = c("edad",        "creatinina", "presion_arterial_sistolica", "inhibidores_ECA_si", "sodio", "crepitantes_no", "ingurgitacion_yugular_si",   "hepatomegalia_si", "edemas_no", "betabloqueadores_si", "valvulopatias_no", "digoxina_si"), listclass = c(""),
   grupos = 4, sinicio = 1234, repe = 10)
 
-modelo_logistica_aic$modelo = "Logística (AIC)"
+modelo_logistica_aic$modelo = "logist_aic"
 
 ## Modelo Logística (BIC):
 
 modelo_logistica_bic <- cruzadalogistica(data = as.data.frame(HF_prep), vardep = "mortalidad", listconti = c("edad",        "creatinina", "presion_arterial_sistolica"), listclass = c(""), grupos = 4, sinicio = 1234, repe = 10)
 
-modelo_logistica_bic$modelo = "Logística (BIC)"
+modelo_logistica_bic$modelo = "logist_bic"
 
 ## Modelo Logistica (Boruta):
 
 modelo_logistica_boruta <- cruzadalogistica(data = as.data.frame(HF_prep), vardep = "mortalidad", listconti = c("edad",     "presion_arterial_sistolica", "creatinina", "sodio"), listclass = c(""), grupos = 4, sinicio = 1234, repe = 10)
 
-modelo_logistica_boruta$modelo = "Logística (Boruta)"
+modelo_logistica_boruta$modelo = "logist_boruta"
 
 ## Modelo Logística (MMPC):
 
 modelo_logistica_mmpc <- cruzadalogistica(data = as.data.frame(HF_prep), vardep = "mortalidad", listconti = c("edad",       "presion_arterial_sistolica", "creatinina", "sodio", "crepitantes_no", "inhibidores_ECA_si"), listclass = c(""),
   grupos = 4, sinicio = 1234, repe = 10)
 
-modelo_logistica_mmpc$modelo = "Logística (MMPC)"
+modelo_logistica_mmpc$modelo = "logist_mmpc"
 
 ## Modelo Logística (AICrep):
 
 modelo_logistica_aic_rep <- cruzadalogistica(data = as.data.frame(HF_prep), vardep = "mortalidad", listconti = c("edad",    "creatinina", "inhibidores_ECA_si", "ingurgitacion_yugular_si", "presion_arterial_sistolica", "crepitantes_no",           "estatinas_si", "edemas_no", "hepatomegalia_si", "sodio"), listclass = c(""), grupos = 4, sinicio = 1234, repe = 10)
 
-modelo_logistica_aic_rep$modelo = "Logística (AICrep)"
+modelo_logistica_aic_rep$modelo = "logist_aic_rep"
 
 ## Modelo Logística (BICrep):
 
 modelo_logistica_bic_rep <- cruzadalogistica(data = as.data.frame(HF_prep), vardep = "mortalidad", listconti = c("edad",    "creatinina"), listclass = c(""), grupos = 4, sinicio = 1234, repe = 10)
 
-modelo_logistica_bic_rep$modelo = "Logística (BICrep)"
+modelo_logistica_bic_rep$modelo = "logist_bic_rep"
 
 
 # Gráficos boxplot:
 
 union <- rbind(modelo_logistica_sbf, modelo_logistica_rfe, modelo_logistica_aic, modelo_logistica_bic,              modelo_logistica_boruta, modelo_logistica_mmpc, modelo_logistica_aic_rep, modelo_logistica_bic_rep)
 
-par(cex.axis = 0.8, las = 2)
+par(cex.axis = 0.7, las = 2)
 boxplot(data = union, col = "pink", tasa ~ modelo, main = "TASA DE FALLOS")
 
 par(cex.axis = 0.7, las = 2)
 boxplot(data = union, col = "pink", auc ~ modelo, main = "AUC")
-
-
-# Tabla con los modelos seleccionados:
-
-tabla_2 <- as_tibble(cbind(Modelo = c("Logística (AIC)", "Logística (AICrep)", "Logística (BIC)", "Logística        (BICrep)", "Logística (Boruta)", "Logística (MMPC)", "Logística (RFE)", "Logística (SBF)"), 
-  Num_variables = c(length(variables_aic) - 1, length(variables_aic_rep), length(variables_bic) - 1,
-  length(variables_bic_rep), length(variables_boruta), length(variables_mmpc), 8, length(variables_sbf)),
-  Variables = c("")))
-
-tabla_2
 
 
 ```
@@ -1587,23 +1562,23 @@ tabla_2
 
 Con respecto al **primer gráfico boxplot**: 
 
-* El modelo Logística (MMPC) es el que menor tasa de fallos presenta en sus predicciones.
+* El modelo logist_mmpc es el que menor tasa de fallos presenta en sus predicciones.
 
-* No obstante, en términos de varianza, los modelos Logística (AICrep) y Logística (RFE) son los que presentan menor varianza de los resultados.   
+* No obstante, en términos de varianza, los modelos logist_aic_rep y logist_rfe son los que presentan menor varianza de los resultados.   
 
-* Se observa que el modelo con menor número de variables seleccionadas es Logística (BICrep). Este modelo es de los que mayor tasa de fallos presenta en sus predicciones.   
+* Se observa que el modelo con menor número de variables seleccionadas es logist_bic_rep. Este modelo es de los que mayor tasa de fallos presenta en sus predicciones.   
 
 
 En el **segundo gráfico boxplot**:
 
-* El modelo Logística (AICrep) es el que mayor AUC presenta.  
+* El modelo logist_aic_rep es el que mayor AUC presenta.  
 
-* Sin embargo, el modelo Logística (BICrep) es el que presenta menor varianza de los resultados.  
+* Sin embargo, el modelo logist_bic_rep es el que presenta menor varianza de los resultados.  
 
-* El modelo con menor número de variables seleccionadas es Logística (BICrep). Este modelo tiene un AUC menor que otros.   
+* El modelo con menor número de variables seleccionadas es logist_bic_rep. Este modelo tiene un AUC menor que otros.   
 
 
-Con todo esto y en vista de las pocas observaciones de la clase minoritaria de la variable objetivo, vamos a considerar el **modelo Logística (MMPC)** como **el modelo de regresión logística más tentativo**, ya que, en conjunto, presentan las características más apropiadas.   
+Con todo esto y en vista de las pocas observaciones de la clase minoritaria de la variable objetivo, vamos a considerar el **modelo logist_mmpc** como **el modelo de regresión logística más tentativo**, ya que, en conjunto, presentan las características más apropiadas.   
 
 
 ## 7: Tuneado de redes neuronales (con método MMPC).
@@ -1682,26 +1657,18 @@ En este apartado, se añade la mejor red neuronal a la comparativa con los mejor
 modelo_rednnet <- cruzadaavnnetbin(data = HF_prep, vardep = "mortalidad", listconti = c("edad",                             "presion_arterial_sistolica", "creatinina", "sodio", "crepitantes_no", "inhibidores_ECA_si"), listclass = c(""),
   grupos = 4, sinicio = 1234, repe = 10, repeticiones = 5, itera = 100, size = 5, decay = 0.01)
 
-modelo_rednnet$modelo = "Red neuronal"
+modelo_rednnet$modelo = "rednnet"
 
 
 # Gráficos boxplot:
 
 union2 <- rbind(modelo_logistica_mmpc, modelo_rednnet)
 
-par(cex.axis = 0.8)
+par(cex.axis = 0.9)
 boxplot(data = union2, col = "pink", tasa ~ modelo, main = "TASA DE FALLOS")
 
-par(cex.axis = 0.7)
+par(cex.axis = 0.9)
 boxplot(data = union2, col = "pink", auc ~ modelo, main = "AUC") 
-
-
-# Tabla con los modelos seleccionados:
-
-tabla_3 <- as_tibble(cbind(Modelo = c("Logística (MMPC)", "Red neuronal"), 
-  Num_variables = c(length(variables_mmpc), length(variables_mmpc)), Variables = c("")))
-
-tabla_3
 
 
 ```
@@ -1709,16 +1676,16 @@ tabla_3
 
 Observando el **primer gráfico boxplot**:  
 
-* El modelo Logística (MMPC) es el que menor tasa de fallos presenta en sus predicciones.  
+* El modelo logist_mmpc es el que menor tasa de fallos presenta en sus predicciones.  
 
 * En términos de varianza, es el mismo modelo el que presenta una menor varianza de los resultados.   
 
 
 Si nos fijamos en el **segundo gráfico boxplot**:  
 
-* El modelo Logística (MMPC) es el que mayor AUC presenta.   
+* El modelo logist_mmpc es el que mayor AUC presenta.   
 
-* Además, este mismo modelo Logística (MMPC) presenta una varianza de los resultados menor.   
+* Además, este mismo modelo logist_mmpc presenta una varianza de los resultados menor.   
 
 
 ## 9: Tuneado de Bagging y Rf.
@@ -1749,8 +1716,12 @@ tabla <- as.data.frame(importance(final))
 tabla <- tabla[order(- tabla$MeanDecreaseAccuracy), ]
 tabla
 
-par(cex.axis = 0.7, las = 2)
-barplot(tabla$MeanDecreaseAccuracy, names.arg = rownames(tabla))
+ggplot(tabla, aes(x = reorder(row.names(tabla), - MeanDecreaseAccuracy), y = MeanDecreaseAccuracy)) +
+  geom_bar(stat = "identity", color = "black", fill = "grey", alpha = 0.8) +
+  labs(title = "Importancia de variables (Bagging y Rf)", x = "Variables") +
+  theme_minimal() +
+  geom_text(label = row.names(tabla), hjust = 0, angle = 90) +
+  theme(axis.text.x = element_blank())
 
 
 ```
@@ -1772,7 +1743,7 @@ set.seed(1234)
 
 rf_2 <- train(mortalidad ~ edad + creatinina + presion_arterial_sistolica + sodio + hemoglobina + inhibidores_ECA_si,
   data = HF_prep, method = "rf", trControl = trainControl(method = "repeatedcv", number = 4, repeats = 5, 
-  savePredictions = "all", classProbs = TRUE), tuneGrid = expand.grid(mtry = c(4, 5, 7, 12, 14, 15, 31)),
+  savePredictions = "all", classProbs = TRUE), tuneGrid = expand.grid(mtry = c(2, 3, 4, 6)),
   linout = FALSE, ntree = 5000, nodesize = 10, replace = TRUE, importance = TRUE)
 
 rf_2
@@ -1781,8 +1752,7 @@ rf_2
 ```
 
 
-Nos quedamos con mtry = 4 para 'Rf', puesto que es el proporciona un Accuracy mayor.   
-
+Nos quedamos con mtry = 4 para 'Rf', para no concurrir en sobreajuste y establecer un número oportuno de variables en cada árbol generado.   
 
 En siguiente lugar, vamos a decidir el mínimo número de ntree para 'Bagging':
 
@@ -1794,7 +1764,10 @@ set.seed(1234)
 baggingbis <- randomForest(mortalidad ~ edad + creatinina + presion_arterial_sistolica + sodio + hemoglobina +
   inhibidores_ECA_si, data = HF_prep, mtry = 6, ntree = 5000, sampsize = 300, nodesize = 10, replace = TRUE)
 
-plot(baggingbis$err.rate[, 1])
+ggplot(as.data.frame(baggingbis$err.rate), aes(x = seq(1, 5000), y = OOB)) +
+  geom_point(color = "black", alpha = 0.8) +
+  labs(title = "Tasa de error en función del parámetro ntree (Bagging)", x = "ntree", y = "Tasa de error") +
+  theme_minimal()
 
 
 ```
@@ -1821,56 +1794,56 @@ source("cruzada rf binaria.R")
 modelo_bagging <- cruzadarfbin(data = HF_prep, vardep = "mortalidad", listconti = c("edad", "creatinina",                   "presion_arterial_sistolica", "sodio", "hemoglobina", "inhibidores_ECA_si"), listclass = c(""), grupos = 4,
   sinicio = 1234, repe = 10, nodesize = 10, mtry = 6, ntree = 300, replace = TRUE, sampsize = 50)
 
-modelo_bagging$modelo = "Bagging"
+modelo_bagging$modelo = "bagging"
 
 ## Modelo Bagging 2:
 
 modelo_bagging_2 <- cruzadarfbin(data = HF_prep, vardep = "mortalidad", listconti = c("edad", "creatinina",                 "presion_arterial_sistolica", "sodio", "hemoglobina", "inhibidores_ECA_si"), listclass = c(""),grupos = 4,
   sinicio = 1234, repe = 10, nodesize = 10, mtry = 6, ntree = 300, replace = TRUE, sampsize = 100)
 
-modelo_bagging_2$modelo = "Bagging 2"
+modelo_bagging_2$modelo = "bagging_2"
 
 ## Modelo Bagging 3:
 
 modelo_bagging_3 <- cruzadarfbin(data = HF_prep, vardep = "mortalidad", listconti = c("edad", "creatinina",                 "presion_arterial_sistolica", "sodio", "hemoglobina", "inhibidores_ECA_si"), listclass = c(""), grupos = 4,
   sinicio = 1234, repe = 10, nodesize = 10, mtry = 6, ntree = 300, replace = TRUE, sampsize = 150)
 
-modelo_bagging_3$modelo = "Bagging 3"
+modelo_bagging_3$modelo = "bagging_3"
 
 ## Modelo Bagging 4:
 
 modelo_bagging_4 <- cruzadarfbin(data = HF_prep, vardep = "mortalidad", listconti = c("edad", "creatinina",                 "presion_arterial_sistolica", "sodio", "hemoglobina", "inhibidores_ECA_si"), listclass = c(""), grupos = 4,
   sinicio = 1234, repe = 10, nodesize = 10, mtry = 6, ntree = 300, replace = TRUE, sampsize = 200)
 
-modelo_bagging_4$modelo = "Bagging 4"
+modelo_bagging_4$modelo = "bagging_4"
 
 ## Modelo Bagging 5:
 
 modelo_bagging_5 <- cruzadarfbin(data = HF_prep, vardep = "mortalidad", listconti = c("edad", "creatinina",                 "presion_arterial_sistolica", "sodio", "hemoglobina", "inhibidores_ECA_si"), listclass = c(""), grupos = 4,
   sinicio = 1234, repe = 10, nodesize = 10, mtry = 6, ntree = 300, replace = TRUE, sampsize = 300)
 
-modelo_bagging_5$modelo = "Bagging 5"
+modelo_bagging_5$modelo = "bagging_5"
 
 ## Modelo Bagging 6:
 
 modelo_bagging_6 <- cruzadarfbin(data = HF_prep, vardep = "mortalidad", listconti = c("edad", "creatinina",                 "presion_arterial_sistolica", "sodio", "hemoglobina", "inhibidores_ECA_si"), listclass = c(""), grupos = 4,
   sinicio = 1234, repe = 10, nodesize = 10, mtry = 6, ntree = 300, replace = TRUE, sampsize = 400)
 
-modelo_bagging_6$modelo = "Bagging 6"
+modelo_bagging_6$modelo = "bagging_6"
 
 ## Modelo Bagging 7:
 
 modelo_bagging_7 <- cruzadarfbin(data = HF_prep, vardep = "mortalidad", listconti = c("edad", "creatinina",                 "presion_arterial_sistolica", "sodio", "hemoglobina", "inhibidores_ECA_si"), listclass = c(""), grupos = 4,
   sinicio = 1234, repe = 10, nodesize = 10, mtry = 6, ntree = 300, replace = TRUE, sampsize = 500)
 
-modelo_bagging_7$modelo = "Bagging 7"
+modelo_bagging_7$modelo = "bagging_7"
 
 ## Modelo Bagging BASE:
 
 modelo_bagging_base <- cruzadarfbin(data = HF_prep, vardep = "mortalidad", listconti = c("edad", "creatinina",              "presion_arterial_sistolica", "sodio", "hemoglobina", "inhibidores_ECA_si"), listclass = c(""), grupos = 4,
   sinicio = 1234, repe = 10, nodesize = 10, mtry = 6, ntree = 300, replace = TRUE)
 
-modelo_bagging_base$modelo = "Bagging BASE"
+modelo_bagging_base$modelo = "bagging_base"
 
 
 # Gráficos boxplot:
@@ -1878,17 +1851,17 @@ modelo_bagging_base$modelo = "Bagging BASE"
 union3 <- rbind(modelo_bagging, modelo_bagging_2, modelo_bagging_3, modelo_bagging_4, modelo_bagging_5,
   modelo_bagging_6, modelo_bagging_7, modelo_bagging_base)
 
-par(cex.axis = 0.8)
+par(cex.axis = 0.6)
 boxplot(data = union3, col = "pink", tasa ~ modelo, main = "TASA DE FALLOS")
 
-par(cex.axis = 0.7)
+par(cex.axis = 0.6)
 boxplot(data = union3, col = "pink", auc ~ modelo, main = "AUC")
 
 
 ```
 
 
-Nos quedamos con **mtry = 6, ntree = 300 y sampsize = 50 para 'Bagging'** ya que es el modelo que mejor equilibrio establece entre una baja tasa de fallos, un buen AUC y una menor varianza de los resultados. Es decir, elegimos el **modelo Bagging**.   
+Nos quedamos con **mtry = 6, ntree = 300 y sampsize = 50 para 'Bagging'** ya que es el modelo que mejor equilibrio establece entre una baja tasa de fallos, un buen AUC y una menor varianza de los resultados. Es decir, elegimos el **modelo bagging**.   
 
 
 Por otro lado, decidamos el mínimo número de ntree para 'Rf':  
@@ -1901,7 +1874,10 @@ set.seed(1234)
 rfbis <- randomForest(mortalidad ~ edad + creatinina + presion_arterial_sistolica + sodio + hemoglobina +
   inhibidores_ECA_si, data = HF_prep, mtry = 4, ntree = 5000, sampsize = 300, nodesize = 10, replace = TRUE)
 
-plot(rfbis$err.rate[, 1])
+ggplot(as.data.frame(rfbis$err.rate), aes(x = seq(1, 5000), y = OOB)) +
+  geom_point(color = "black", alpha = 0.8) +
+  labs(title = "Tasa de error en función del parámetro ntree (Rf)", x = "ntree", y = "Tasa de error") +
+  theme_minimal()
 
 
 ```
@@ -1925,56 +1901,56 @@ Entonces:
 modelo_rf <- cruzadarfbin(data = HF_prep, vardep = "mortalidad", listconti = c("edad", "creatinina",                        "presion_arterial_sistolica", "sodio", "hemoglobina", "inhibidores_ECA_si"), listclass = c(""), grupos = 4,
   sinicio = 1234, repe = 10, nodesize = 10, mtry = 4, ntree = 200, replace = TRUE, sampsize = 50)
 
-modelo_rf$modelo = "Rf"
+modelo_rf$modelo = "rf"
 
 ## Modelo Rf 2:
 
 modelo_rf_2 <- cruzadarfbin(data = HF_prep, vardep = "mortalidad", listconti = c("edad", "creatinina",                      "presion_arterial_sistolica", "sodio", "hemoglobina", "inhibidores_ECA_si"), listclass = c(""), grupos = 4,
   sinicio = 1234, repe = 10, nodesize = 10, mtry = 4, ntree = 200, replace = TRUE, sampsize = 100)
 
-modelo_rf_2$modelo = "Rf 2"
+modelo_rf_2$modelo = "rf_2"
 
 ## Modelo Rf 3:
 
 modelo_rf_3 <- cruzadarfbin(data = HF_prep, vardep = "mortalidad", listconti = c("edad", "creatinina",                      "presion_arterial_sistolica", "sodio", "hemoglobina", "inhibidores_ECA_si"), listclass = c(""), grupos = 4,
   sinicio = 1234, repe = 10, nodesize = 10, mtry = 4, ntree = 200, replace = TRUE, sampsize = 150)
 
-modelo_rf_3$modelo = "Rf 3"
+modelo_rf_3$modelo = "rf_3"
 
 ## Modelo Rf 4:
 
 modelo_rf_4 <- cruzadarfbin(data = HF_prep, vardep = "mortalidad", listconti = c("edad", "creatinina",                      "presion_arterial_sistolica", "sodio", "hemoglobina", "inhibidores_ECA_si"), listclass = c(""), grupos = 4,
   sinicio = 1234, repe = 10, nodesize = 10, mtry = 4, ntree = 200, replace = TRUE, sampsize = 200)
 
-modelo_rf_4$modelo = "Rf 4"
+modelo_rf_4$modelo = "rf_4"
 
 ## Modelo Rf 5:
 
 modelo_rf_5 <- cruzadarfbin(data = HF_prep, vardep = "mortalidad", listconti = c("edad", "creatinina",                      "presion_arterial_sistolica", "sodio", "hemoglobina", "inhibidores_ECA_si"), listclass = c(""), grupos = 4,
   sinicio = 1234, repe = 10, nodesize = 10, mtry = 4, ntree = 200, replace = TRUE, sampsize = 300)
 
-modelo_rf_5$modelo = "Rf 5"
+modelo_rf_5$modelo = "rf_5"
 
 ## Modelo Rf 6:
 
 modelo_rf_6 <- cruzadarfbin(data = HF_prep, vardep = "mortalidad", listconti = c("edad", "creatinina",                      "presion_arterial_sistolica", "sodio", "hemoglobina", "inhibidores_ECA_si"), listclass = c(""), grupos = 4,
   sinicio = 1234, repe = 10, nodesize = 10, mtry = 4, ntree = 200, replace = TRUE, sampsize = 400)
 
-modelo_rf_6$modelo = "Rf 6"
+modelo_rf_6$modelo = "rf_6"
 
 ## Modelo Rf 7:
 
 modelo_rf_7 <- cruzadarfbin(data = HF_prep, vardep = "mortalidad", listconti = c("edad", "creatinina",                      "presion_arterial_sistolica", "sodio", "hemoglobina", "inhibidores_ECA_si"), listclass = c(""), grupos = 4,
   sinicio = 1234, repe = 10, nodesize = 10, mtry = 4, ntree = 200, replace = TRUE, sampsize = 500)
 
-modelo_rf_7$modelo = "Rf 7"
+modelo_rf_7$modelo = "rf_7"
 
 ## Modelo Rf BASE:
 
 modelo_rf_base <- cruzadarfbin(data = HF_prep, vardep = "mortalidad", listconti = c("edad", "creatinina",                   "presion_arterial_sistolica", "sodio", "hemoglobina", "inhibidores_ECA_si"), listclass = c(""), grupos = 4,
   sinicio = 1234, repe = 10, nodesize = 10, mtry = 4, ntree = 200, replace = TRUE)
 
-modelo_rf_base$modelo = "Rf BASE"
+modelo_rf_base$modelo = "rf_base"
 
 
 # Gráficos boxplot:
@@ -1982,40 +1958,32 @@ modelo_rf_base$modelo = "Rf BASE"
 union4 <- rbind(modelo_rf, modelo_rf_2, modelo_rf_3, modelo_rf_4, modelo_rf_5, modelo_rf_6, modelo_rf_7,
   modelo_rf_base)
 
-par(cex.axis = 0.8)
+par(cex.axis = 0.9)
 boxplot(data = union4, col = "pink", tasa ~ modelo, main = "TASA DE FALLOS")
 
-par(cex.axis = 0.7)
+par(cex.axis = 0.9)
 boxplot(data = union4, col = "pink", auc ~ modelo, main = "AUC")
 
 
 ```
 
-Nos quedamos con **mtry = 4, ntree = 200 y sampsize = 50 para 'Rf'**, puesto que, en conjunto, es el modelo que mejores características presenta en relación a la tasa de fallos, AUC y varianza de los resultados. Es decir, se elige el **modelo Rf**.  
+Nos quedamos con **mtry = 4, ntree = 200 y sampsize = 50 para 'Rf'**, puesto que, en conjunto, es el modelo que mejores características presenta en relación a la tasa de fallos, AUC y varianza de los resultados. Es decir, se elige el **modelo rf**.  
 
 
 ## 10: Comparación de modelos con Bagging y Random forest.
 
-En este apartado, se añaden el **modelo Bagging** y el **modelo Rf** a la comparativa con el resto de modelos:   
+En este apartado, se añaden el **modelo bagging** y el **modelo rf** a la comparativa con el resto de modelos:   
 
 ```{r eval = TRUE}
 # Gráficos boxplot:
 
 union5 <- rbind(modelo_logistica_mmpc, modelo_rednnet, modelo_bagging, modelo_rf)
 
-par(cex.axis = 0.8)
+par(cex.axis = 0.9)
 boxplot(data = union5, col = "pink", tasa ~ modelo, main = "TASA DE FALLOS")
 
-par(cex.axis = 0.7)
+par(cex.axis = 0.9)
 boxplot(data = union5, col = "pink", auc ~ modelo, main = "AUC") 
-
-
-# Tabla con los modelos seleccionados:
-
-tabla_4 <- as_tibble(cbind(Modelo = c("Bagging", "Logística (MMPC)", "Red neuronal", "Rf"), 
-  Num_variables = c(6, length(variables_mmpc), length(variables_mmpc), 6), Variables = c("")))
-
-tabla_4
 
 
 ```
@@ -2023,16 +1991,16 @@ tabla_4
 
 Observando el **primer gráfico boxplot**:  
 
-* El modelo Logística (MMPC) es el que menor tasa de fallos presenta en sus predicciones.  
+* El modelo logist_mmpc es el que menor tasa de fallos presenta en sus predicciones.  
 
-* A simple vista, son los modelos Logística (MMPC) y Rf los que presentan menor varianza de los resultados.   
+* A simple vista, son los modelos logist_mmpc y rf los que presentan menor varianza de los resultados.   
  
 
 Si nos fijamos en el **segundo gráfico boxplot**:  
 
-* Los modelos Logística (MMPC) y Rf son los que mayor AUC presentan.   
+* Los modelos logist_mmpc y rf son los que mayor AUC presentan.   
 
-* No obstante, es el modelo Bagging el que presenta una menor varianza de los resultados.   
+* No obstante, es el modelo bagging el que presenta una menor varianza de los resultados.   
 
 
 ## 11: Tuneado de Gbm.
@@ -2057,16 +2025,20 @@ gbm <- train(mortalidad ~ ., data = HF_prep, method = "gbm", trControl = trainCo
   verbose = FALSE)
 
 gbm
+
 plot(gbm)
 
 
 # Importancia de variables Gbm:
 
-par(cex = 0.7, las = 2)
 tabla <- summary(gbm)
 
-par(cex = 0.7, las = 2)
-barplot(tabla$rel.inf, names.arg = row.names(tabla))
+ggplot(tabla, aes(x = reorder(row.names(tabla), - rel.inf), y = rel.inf)) +
+  geom_bar(stat = "identity", color = "black", fill = "grey", alpha = 0.8) +
+  labs(title = "Importancia de variables (Gbm)", x = "Variables", y = "Influencia Relativa") +
+  theme_minimal() +
+  geom_text(label = row.names(tabla), hjust = 0, angle = 90) +
+  theme(axis.text.x = element_blank())
 
 
 ```
@@ -2091,6 +2063,7 @@ gbm_2 <- train(mortalidad ~ edad + creatinina + presion_arterial_sistolica + sod
   distribution = "bernoulli", bag.fraction = 1, verbose = FALSE)
 
 gbm_2
+
 plot(gbm_2)
 
 
@@ -2115,7 +2088,12 @@ gbm_3 <- train(mortalidad ~ edad + creatinina + presion_arterial_sistolica + sod
   interaction.depth = 2), distribution = "bernoulli", bag.fraction = 1, verbose = FALSE)
 
 gbm_3
-plot(gbm_3)
+
+ggplot(gbm_3$results, aes(x = n.trees, y = Accuracy)) +
+  geom_line(color = "black", alpha = 0.8) +
+  geom_point(color = "black", alpha = 0.8) +
+  labs(title = "Accuracy en función del parámetro n.trees (Gbm)", x = "n.trees", y = "Accuracy") +
+  theme_minimal()
 
 
 ```
@@ -2138,26 +2116,18 @@ source ("cruzada gbm binaria.R")
 modelo_gbm <- cruzadagbmbin(data = HF_prep, vardep = "mortalidad", listconti = c("edad", "creatinina",                      "presion_arterial_sistolica", "sodio"), listclass = c(""), grupos = 4, sinicio = 1234, repe = 10, shrinkage = 0.05,
   n.minobsinnode = 20, n.trees = 75, interaction.depth = 2)
 
-modelo_gbm$modelo = "Gbm"
+modelo_gbm$modelo = "gbm"
 
 
 # Gráficos boxplot:
 
 union6 <- rbind(modelo_logistica_mmpc, modelo_rednnet, modelo_bagging, modelo_rf, modelo_gbm)
 
-par(cex.axis = 0.8)
+par(cex.axis = 0.9)
 boxplot(data = union6, col = "pink", tasa ~ modelo, main = "TASA DE FALLOS")
 
-par(cex.axis = 0.7)
+par(cex.axis = 0.9)
 boxplot(data = union6, col = "pink", auc ~ modelo, main = "AUC") 
-
-
-# Tabla con los modelos seleccionados:
-
-tabla_5 <- as_tibble(cbind(Modelo = c("Bagging", "Gbm", "Logística (MMPC)", "Red neuronal", "Rf"), 
-  Num_variables = c(6, 4, length(variables_mmpc), length(variables_mmpc), 6), Variables = c("")))
-
-tabla_5
 
 
 ```
@@ -2165,18 +2135,18 @@ tabla_5
 
 Observando el **primer gráfico boxplot**:  
 
-* El modelo Gbm es el que menor tasa de fallos presenta en sus predicciones.   
+* El modelo gbm es el que menor tasa de fallos presenta en sus predicciones.   
 
-* En términos de varianza, los modelos Logística (MMPC), Rf y Gbm son los que presentan menor varianza de los resultados.   
+* En términos de varianza, los modelos logist_mmpc, rf y gbm son los que presentan menor varianza de los resultados.   
 
 
 Si nos fijamos en el **segundo gráfico boxplot**:  
 
-* Los modelos Logística (MMPC) y Rf son los que mayor AUC presentan.   
+* Los modelos logist_mmpc y rf son los que mayor AUC presentan.   
 
-* Sin embargo, el modelo Bagging es el que presenta una menor varianza de los resultados.   
+* Sin embargo, el modelo bagging es el que presenta una menor varianza de los resultados.   
 
-* El modelo con menor número de variables seleccionadas es Gbm. Este modelo tiene un AUC menor que otros.   
+* El modelo con menor número de variables seleccionadas es gbm. Este modelo tiene un AUC menor que otros.   
 
 
 ## 13: Tuneado de XGboost.
@@ -2197,13 +2167,21 @@ xgbm <- train(mortalidad ~ ., data = HF_prep, method = "xgbTree", trControl = tr
   verbose = FALSE)
 
 xgbm
+
 plot(xgbm)
 
 
 # Importancia de variables XGBoost:
 
-varImp(xgbm)
-plot(varImp(xgbm))
+tabla <- varImp(xgbm)$importance
+tabla
+
+ggplot(tabla, aes(x = reorder(row.names(tabla), - Overall), y = Overall)) +
+  geom_bar(stat = "identity", color = "black", fill = "grey", alpha = 0.8) +
+  labs(title = "Importancia de variables (Xgboost)", x = "Variables", y = "Importancia") +
+  theme_minimal() +
+  geom_text(label = row.names(tabla), hjust = 0, angle = 90) +
+  theme(axis.text.x = element_blank())
 
 
 ```
@@ -2228,6 +2206,7 @@ xgbm_2 <- train(mortalidad ~ edad + creatinina + presion_arterial_sistolica + pr
   nrounds = c(50, 100, 500, 1000), max_depth = 6, gamma = 0, colsample_bytree = 1, subsample = 1), verbose = FALSE)
 
 xgbm_2
+
 plot(xgbm_2)
 
 
@@ -2253,7 +2232,12 @@ xgbm_3 <- train(mortalidad ~ edad + creatinina + presion_arterial_sistolica + pr
   max_depth = 6, gamma = 0, colsample_bytree = 1, subsample = 1), verbose = FALSE)
 
 xgbm_3
-plot(xgbm_3)
+
+ggplot(xgbm_3$results, aes(x = nrounds, y = Accuracy)) +
+  geom_line(color = "black", alpha = 0.8) +
+  geom_point(color = "black", alpha = 0.8) +
+  labs(title = "Accuracy en función del parámetro nrounds (XGboost)", x = "nrounds", y = "Accuracy") +
+  theme_minimal()
 
 
 ```
@@ -2276,27 +2260,18 @@ source ("cruzada xgboost binaria.R")
 modelo_xgboost <- cruzadaxgbmbin(data = HF_prep, vardep = "mortalidad", listconti = c("edad", "creatinina",                 "presion_arterial_sistolica", "presion_arterial_diastolica", "inhibidores_ECA_si", "sodio", "betabloqueadores_si",        "potasio"), listclass = c(""), grupos = 4, sinicio = 1234, repe = 10, min_child_weight = 20, eta = 0.05, nrounds = 75,
   max_depth = 6, gamma = 0, colsample_bytree = 1, subsample = 1)
 
-modelo_xgboost$modelo = "XGboost"
+modelo_xgboost$modelo = "xgboost"
 
 
 # Gráficos boxplot:
 
 union7 <- rbind(modelo_logistica_mmpc, modelo_rednnet, modelo_bagging, modelo_rf, modelo_gbm, modelo_xgboost)
 
-par(cex.axis = 0.8)
+par(cex.axis = 0.9)
 boxplot(data = union7, col = "pink", tasa ~ modelo, main = "TASA DE FALLOS")
 
-par(cex.axis = 0.7)
-boxplot(data = union7, col = "pink", auc ~ modelo, main = "AUC") 
-
-
-# Tabla con los modelos seleccionados:
-
-tabla_6 <- as_tibble(cbind(Modelo = c("Bagging", "Gbm", "Logística (MMPC)", "Red neuronal", "Rf", "XGboost"),
-  Num_variables = c(6, 4, length(variables_mmpc), length(variables_mmpc), 6, 8), 
-  Variables = c("")))
-
-tabla_6
+par(cex.axis = 0.9)
+boxplot(data = union7, col = "pink", auc ~ modelo, main = "AUC")
 
 
 ```
@@ -2304,18 +2279,18 @@ tabla_6
 
 Observando el **primer gráfico boxplot**:  
 
-* El modelo Gbm es el que menor tasa de fallos presentan en sus predicciones.   
+* El modelo gbm es el que menor tasa de fallos presentan en sus predicciones.   
 
-* En términos de varianza, es el modelo XGboost el que presenta menor varianza de los resultados.   
+* En términos de varianza, es el modelo xgboost el que presenta menor varianza de los resultados.   
 
 
 Si nos fijamos en el **segundo gráfico boxplot**:  
 
-* Los modelos Logística (MMPC) y Rf son los que mayor AUC presenta.   
+* Los modelos logist_mmpc y rf son los que mayor AUC presenta.   
 
-* No obstante, el modelo Bagging es el que presenta una menor varianza de los resultados.  
+* No obstante, el modelo bagging es el que presenta una menor varianza de los resultados.  
 
-* El modelo con menor número de variables seleccionadas es Gbm. Este modelo tiene un AUC menor que otros.   
+* El modelo con menor número de variables seleccionadas es gbm. Este modelo tiene un AUC menor que otros.   
 
 
 ## 15: Tuneado de SVM (lineal).
@@ -2332,17 +2307,19 @@ set.seed(1234)
 SVM_lineal <- train(mortalidad ~ edad + presion_arterial_sistolica + creatinina + sodio + crepitantes_no +
   inhibidores_ECA_si, data = HF_prep, method = "svmLinear", trControl = trainControl(method = "repeatedcv", number = 4,
   repeats = 5, savePredictions = "all", classProbs = TRUE), 
-  tuneGrid = expand.grid(C = c(0.01, 0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 30, 50)), verbose = FALSE)
+  tuneGrid = expand.grid(C = c(0.01, 0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 25, 30, 50)), verbose = FALSE)
 
 SVM_lineal
 SVM_lineal$results
-plot(SVM_lineal$results$C, SVM_lineal$results$Accuracy)
+#plot(SVM_lineal$results$C, SVM_lineal$results$Accuracy)
+ggplot(SVM_lineal$results, aes(x = factor(C), y = Accuracy)) +
+  geom_point(position = position_dodge(width = 0.5), size = 3)
 
 
 ```
 
 
-No se observa máximo de Accuracy, por lo que nos quedamos con **C = 50 para 'SVM (lineal)'**.   
+No se observa máximo de Accuracy, por lo que nos quedamos con **C = 0.1 para 'SVM (lineal)'**.   
 
 
 ## 15: Tuneado de SVM (polinomial).
@@ -2359,19 +2336,19 @@ set.seed(1234)
 SVM_poly <- train(mortalidad ~ edad + presion_arterial_sistolica + creatinina + sodio + crepitantes_no +
   inhibidores_ECA_si, data = HF_prep, method = "svmPoly", trControl = trainControl(method = "repeatedcv", number = 4,
   repeats = 5, savePredictions = "all", classProbs = TRUE),
-  tuneGrid = expand.grid(C = c(0.01, 0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 30, 50), degree = 2,
+  tuneGrid = expand.grid(C = c(0.01, 0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 25, 30, 50), degree = 2,
   scale = c(0.1, 0.5, 1, 2, 5)), verbose = FALSE)
 
 SVM_poly
 SVM_poly$results
-ggplot(SVM_poly$results, aes(x = factor(C), y = Accuracy, color = factor(degree), pch = factor(scale))) +
+ggplot(SVM_poly$results, aes(x = factor(C), y = Accuracy, pch = factor(scale))) +
   geom_point(position = position_dodge(width = 0.5), size = 3)
 
 
 ```
 
 
-En vista del gráfico, nos quedamos con **C = 50 y scale = 5 para 'SVM (poly)'** para evitar sobreajuste.    
+En vista del gráfico, nos quedamos con **C = 0.5 y scale = 5 para 'SVM (polinomial)'** para evitar sobreajuste.    
 
 
 ## 15: Tuneado de SVM (RBF).
@@ -2388,7 +2365,7 @@ set.seed(1234)
 SVM_radial <- train(mortalidad ~ edad + presion_arterial_sistolica + creatinina + sodio + crepitantes_no +
   inhibidores_ECA_si, data = HF_prep, method = "svmRadial", trControl = trainControl(method = "repeatedcv", number = 4,
   repeats = 5, savePredictions = "all", classProbs = TRUE),
-  tuneGrid = expand.grid(C = c(0.01, 0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 30, 50), sigma = c(0.0001, 0.005, 0.01, 0.05)),
+  tuneGrid = expand.grid(C = c(0.01, 0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 25, 30, 50), sigma = c(0.0001, 0.005, 0.01, 0.05)),
   verbose = FALSE)
 
 SVM_radial
@@ -2400,7 +2377,7 @@ ggplot(SVM_radial$results, aes(x = factor(C), y = Accuracy, color = factor(sigma
 ```
 
 
-Nos quedamos con **C = 10 y sigma = 0.01 para 'SVM (RBF)'**.   
+Nos quedamos con **C = 2 y sigma = 0.005 para 'SVM (RBF)'**.   
 
 
 ## 16: Comparación de modelos con SVM (lineal, polinomial y radial).
@@ -2417,23 +2394,23 @@ source ("cruzada SVM binaria RBF.R")
 ## Modelo SVM (lineal):
 
 modelo_svm_lineal <- cruzadaSVMbin(data = HF_prep, vardep = "mortalidad", listconti = c("edad",                             "presion_arterial_sistolica", "creatinina", "sodio", "crepitantes_no", "inhibidores_ECA_si"), listclass = c(""),
-  grupos = 4, sinicio = 1234, repe = 10, C = 50)
+  grupos = 4, sinicio = 1234, repe = 10, C = 0.1)
 
-modelo_svm_lineal$modelo = "SVM (lineal)"
+modelo_svm_lineal$modelo = "svm_lineal"
 
 ## Modelo SVM (polinomial):
 
 modelo_svm_polinomial <- cruzadaSVMbinPoly(data = HF_prep, vardep = "mortalidad", listconti = c("edad",                     "presion_arterial_sistolica", "creatinina", "sodio", "crepitantes_no", "inhibidores_ECA_si"), listclass = c(""),
-  grupos = 4, sinicio = 1234, repe = 10, C = 50, degree = 2, scale = 5)
+  grupos = 4, sinicio = 1234, repe = 10, C = 0.5, degree = 2, scale = 5)
 
-modelo_svm_polinomial$modelo = "SVM (polinomial)"
+modelo_svm_polinomial$modelo = "svm_polinomial"
 
 ## Modelo SVM (RBF):
 
 modelo_svm_rbf <- cruzadaSVMbinRBF(data = HF_prep, vardep = "mortalidad", listconti = c("edad",                             "presion_arterial_sistolica", "creatinina", "sodio", "crepitantes_no", "inhibidores_ECA_si"), listclass = c(""),
-  grupos = 4, sinicio = 1234, repe = 10, C = 10, sigma = 0.01)
+  grupos = 4, sinicio = 1234, repe = 10, C = 2, sigma = 0.005)
 
-modelo_svm_rbf$modelo = "SVM (RBF)"
+modelo_svm_rbf$modelo = "svm_rbf"
 
 
 # Gráficos boxplot:
@@ -2441,21 +2418,11 @@ modelo_svm_rbf$modelo = "SVM (RBF)"
 union8 <- rbind(modelo_logistica_mmpc, modelo_rednnet, modelo_bagging, modelo_rf, modelo_gbm, modelo_xgboost,
   modelo_svm_lineal, modelo_svm_polinomial, modelo_svm_rbf)
 
-par(cex.axis = 0.8, las = 2)
+par(cex.axis = 0.7, las = 2)
 boxplot(data = union8, col = "pink", tasa ~ modelo, main = "TASA DE FALLOS")
 
 par(cex.axis = 0.7, las = 2)
 boxplot(data = union8, col = "pink", auc ~ modelo, main = "AUC") 
-
-
-# Tabla con los modelos seleccionados:
-
-tabla_7 <- as_tibble(cbind(Modelo = c("Bagging", "Gbm", "Logística (MMPC)", "Red neuronal", "Rf", "SVM (lineal)",
-  "SVM (polinomial)", "SVM (RBF)", "XGboost"), Num_variables = c(6, 4, length(variables_mmpc),
-  length(variables_mmpc), 6, length(variables_mmpc), length(variables_mmpc), length(variables_mmpc), 8),
-  Variables = c("")))
-
-tabla_7
 
 
 ```
@@ -2463,18 +2430,18 @@ tabla_7
 
 Observando el **primer gráfico boxplot**:  
 
-* El modelo Gbm es el que menor tasa de fallos presentan en sus predicciones.   
+* El modelo gbm es el que menor tasa de fallos presentan en sus predicciones.   
 
-* En términos de varianza, son los modelos SVM (lineal) y SVM (polinomial) los que presentan menor varianza de los resultados.   
+* En términos de varianza, son los modelos svm_lineal y svm_polinomial los que presentan menor varianza de los resultados.   
 
 
 Si nos fijamos en el **segundo gráfico boxplot**:  
 
-* Los modelos Logística (MMPC) y Rf son los que mayor AUC presentan.   
+* Los modelos logist_mmpc y rf son los que mayor AUC presentan.   
 
-* Sin embargo, es el modelo Bagging el que presenta una menor varianza de los resultados.   
+* Sin embargo, es el modelo bagging el que presenta una menor varianza de los resultados.   
  
-* El modelo con menor número de variables seleccionadas es Gbm. Este modelo es de los que mayor AUC presentan.   
+* El modelo con menor número de variables seleccionadas es gbm. Este modelo es de los que mayor AUC presentan.   
 
 
 ## 17: Ensamblado de modelos.
@@ -2495,9 +2462,9 @@ modelo_logistica_mmpc_ensamblado <- cruzadalogistica(data = as.data.frame(HF_pre
   listclass = c(""), grupos = 4, sinicio = 1234, repe = 10)
 
 modelo_logistica_mmpc_ensamblado_resultados <- as.data.frame(modelo_logistica_mmpc_ensamblado[1])
-modelo_logistica_mmpc_ensamblado_resultados$modelo <- "Logística (MMPC)"
+modelo_logistica_mmpc_ensamblado_resultados$modelo <- "logist_mmpc"
 modelo_logistica_mmpc_ensamblado_predicciones <- as.data.frame(modelo_logistica_mmpc_ensamblado[2])
-modelo_logistica_mmpc_ensamblado_predicciones$logistica_mmpc <- modelo_logistica_mmpc_ensamblado_predicciones$Yes
+modelo_logistica_mmpc_ensamblado_predicciones$logist_mmpc <- modelo_logistica_mmpc_ensamblado_predicciones$Yes
 
 ## Modelo Red neuronal:
 
@@ -2506,7 +2473,7 @@ modelo_rednnet_ensamblado <- cruzadaavnnetbin(data = HF_prep, vardep = "mortalid
   listclass = c(""), grupos = 4, sinicio = 1234, repe = 10, repeticiones = 5, itera = 100, size = 5, decay = 0.01)
 
 modelo_rednnet_ensamblado_resultados <- as.data.frame(modelo_rednnet_ensamblado[1])
-modelo_rednnet_ensamblado_resultados$modelo <- "Red neuronal"
+modelo_rednnet_ensamblado_resultados$modelo <- "rednnet"
 modelo_rednnet_ensamblado_predicciones <- as.data.frame(modelo_rednnet_ensamblado[2])
 modelo_rednnet_ensamblado_predicciones$rednnet <- modelo_rednnet_ensamblado_predicciones$Yes
 
@@ -2516,7 +2483,7 @@ modelo_bagging_ensamblado <- cruzadarfbin(data = HF_prep, vardep = "mortalidad",
   sinicio = 1234, repe = 10, nodesize = 10, mtry = 6, ntree = 300, replace = TRUE, sampsize = 50)
 
 modelo_bagging_ensamblado_resultados <- as.data.frame(modelo_bagging_ensamblado[1])
-modelo_bagging_ensamblado_resultados$modelo <- "Bagging"
+modelo_bagging_ensamblado_resultados$modelo <- "bagging"
 modelo_bagging_ensamblado_predicciones <- as.data.frame(modelo_bagging_ensamblado[2])
 modelo_bagging_ensamblado_predicciones$bagging <- modelo_bagging_ensamblado_predicciones$Yes
 
@@ -2526,7 +2493,7 @@ modelo_rf_ensamblado <- cruzadarfbin(data = HF_prep, vardep = "mortalidad", list
   sinicio = 1234, repe = 10, nodesize = 10, mtry = 4, ntree = 200, replace = TRUE, sampsize = 50)
 
 modelo_rf_ensamblado_resultados <- as.data.frame(modelo_rf_ensamblado[1])
-modelo_rf_ensamblado_resultados$modelo <- "Rf"
+modelo_rf_ensamblado_resultados$modelo <- "rf"
 modelo_rf_ensamblado_predicciones <- as.data.frame(modelo_rf_ensamblado[2])
 modelo_rf_ensamblado_predicciones$rf <- modelo_rf_ensamblado_predicciones$Yes
 
@@ -2536,7 +2503,7 @@ modelo_gbm_ensamblado <- cruzadagbmbin(data = HF_prep, vardep = "mortalidad", li
   n.minobsinnode = 20, n.trees = 75, interaction.depth = 2)
 
 modelo_gbm_ensamblado_resultados <- as.data.frame(modelo_gbm_ensamblado[1])
-modelo_gbm_ensamblado_resultados$modelo <- "Gbm"
+modelo_gbm_ensamblado_resultados$modelo <- "gbm"
 modelo_gbm_ensamblado_predicciones <- as.data.frame(modelo_gbm_ensamblado[2])
 modelo_gbm_ensamblado_predicciones$gbm <- modelo_gbm_ensamblado_predicciones$Yes
 
@@ -2546,44 +2513,44 @@ modelo_xgboost_ensamblado <- cruzadaxgbmbin(data = HF_prep, vardep = "mortalidad
   max_depth = 6, gamma = 0, colsample_bytree = 1, subsample = 1)
 
 modelo_xgboost_ensamblado_resultados <- as.data.frame(modelo_xgboost_ensamblado[1])
-modelo_xgboost_ensamblado_resultados$modelo <- "Xgboost"
+modelo_xgboost_ensamblado_resultados$modelo <- "xgboost"
 modelo_xgboost_ensamblado_predicciones <- as.data.frame(modelo_xgboost_ensamblado[2])
 modelo_xgboost_ensamblado_predicciones$xgboost <- modelo_xgboost_ensamblado_predicciones$Yes
 
 ## Modelo SVM (lineal):
 
 modelo_svm_lineal_ensamblado <- cruzadaSVMbin(data = HF_prep, vardep = "mortalidad", listconti = c("edad",                  "presion_arterial_sistolica", "creatinina", "sodio", "crepitantes_no", "inhibidores_ECA_si"), listclass = c(""),
-  grupos = 4, sinicio = 1234, repe = 10, C = 50)
+  grupos = 4, sinicio = 1234, repe = 10, C = 0.1)
 
 modelo_svm_lineal_ensamblado_resultados <- as.data.frame(modelo_svm_lineal_ensamblado[1])
-modelo_svm_lineal_ensamblado_resultados$modelo <- "SVM (lineal)"
+modelo_svm_lineal_ensamblado_resultados$modelo <- "svm_lineal"
 modelo_svm_lineal_ensamblado_predicciones <- as.data.frame(modelo_svm_lineal_ensamblado[2])
 modelo_svm_lineal_ensamblado_predicciones$svm_lineal <- modelo_svm_lineal_ensamblado_predicciones$Yes
 
 ## Modelo SVM (polinomial):
 
 modelo_svm_polinomial_ensamblado <- cruzadaSVMbinPoly(data = HF_prep, vardep = "mortalidad", listconti = c("edad",          "presion_arterial_sistolica", "creatinina", "sodio", "crepitantes_no", "inhibidores_ECA_si"), listclass = c(""),
-  grupos = 4, sinicio = 1234, repe = 10, C = 50, degree = 2, scale = 5)
+  grupos = 4, sinicio = 1234, repe = 10, C = 0.5, degree = 2, scale = 5)
 
 modelo_svm_polinomial_ensamblado_resultados <- as.data.frame(modelo_svm_polinomial_ensamblado[1])
-modelo_svm_polinomial_ensamblado_resultados$modelo <- "SVM (polinomial)"
+modelo_svm_polinomial_ensamblado_resultados$modelo <- "svm_polinomial"
 modelo_svm_polinomial_ensamblado_predicciones <- as.data.frame(modelo_svm_polinomial_ensamblado[2])
 modelo_svm_polinomial_ensamblado_predicciones$svm_polinomial <- modelo_svm_polinomial_ensamblado_predicciones$Yes
 
 ## Modelo SVM (RBF):
 
 modelo_svm_rbf_ensamblado <- cruzadaSVMbinRBF(data = HF_prep, vardep = "mortalidad", listconti = c("edad",                  "presion_arterial_sistolica", "creatinina", "sodio", "crepitantes_no", "inhibidores_ECA_si"), listclass = c(""),
-  grupos = 4, sinicio = 1234, repe = 10, C = 10, sigma = 0.01)
+  grupos = 4, sinicio = 1234, repe = 10, C = 2, sigma = 0.005)
 
 modelo_svm_rbf_ensamblado_resultados <- as.data.frame(modelo_svm_rbf_ensamblado[1])
-modelo_svm_rbf_ensamblado_resultados$modelo <- "SVM (RBF)"
+modelo_svm_rbf_ensamblado_resultados$modelo <- "svm_rbf"
 modelo_svm_rbf_ensamblado_predicciones <- as.data.frame(modelo_svm_rbf_ensamblado[2])
 modelo_svm_rbf_ensamblado_predicciones$svm_rbf <- modelo_svm_rbf_ensamblado_predicciones$Yes
 
 
 # 4: CONSTRUCCION DE TODOS LOS ENSAMBLADOS:
 
-unipredi <- cbind(modelo_logistica_mmpc_ensamblado_predicciones ,modelo_rednnet_ensamblado_predicciones, 
+unipredi <- cbind(modelo_logistica_mmpc_ensamblado_predicciones, modelo_rednnet_ensamblado_predicciones, 
   modelo_bagging_ensamblado_predicciones, modelo_rf_ensamblado_predicciones,
   modelo_gbm_ensamblado_predicciones, modelo_xgboost_ensamblado_predicciones,
   modelo_svm_lineal_ensamblado_predicciones, modelo_svm_polinomial_ensamblado_predicciones,
@@ -2595,14 +2562,14 @@ unipredi <- unipredi[, !duplicated(colnames(unipredi))]
 
 ## Construccion de ensamblados:
 
-unipredi$predi10 <- (unipredi$logistica_mmpc + unipredi$rednnet) / 2
-unipredi$predi11 <- (unipredi$logistica_mmpc + unipredi$bagging) / 2
-unipredi$predi12 <- (unipredi$logistica_mmpc + unipredi$rf) / 2
-unipredi$predi13 <- (unipredi$logistica_mmpc + unipredi$gbm) / 2
-unipredi$predi14 <- (unipredi$logistica_mmpc + unipredi$xgboost) / 2
-unipredi$predi15 <- (unipredi$logistica_mmpc + unipredi$svm_lineal) / 2
-unipredi$predi16 <- (unipredi$logistica_mmpc + unipredi$svm_polinomial) / 2
-unipredi$predi17 <- (unipredi$logistica_mmpc + unipredi$svm_rbf) / 2
+unipredi$predi10 <- (unipredi$logist_mmpc + unipredi$rednnet) / 2
+unipredi$predi11 <- (unipredi$logist_mmpc + unipredi$bagging) / 2
+unipredi$predi12 <- (unipredi$logist_mmpc + unipredi$rf) / 2
+unipredi$predi13 <- (unipredi$logist_mmpc + unipredi$gbm) / 2
+unipredi$predi14 <- (unipredi$logist_mmpc + unipredi$xgboost) / 2
+unipredi$predi15 <- (unipredi$logist_mmpc + unipredi$svm_lineal) / 2
+unipredi$predi16 <- (unipredi$logist_mmpc + unipredi$svm_polinomial) / 2
+unipredi$predi17 <- (unipredi$logist_mmpc + unipredi$svm_rbf) / 2
 unipredi$predi18 <- (unipredi$rednnet + unipredi$bagging) / 2
 unipredi$predi19 <- (unipredi$rednnet + unipredi$rf) / 2
 unipredi$predi20 <- (unipredi$rednnet + unipredi$gbm) / 2
@@ -2629,31 +2596,31 @@ unipredi$predi40 <- (unipredi$xgboost + unipredi$svm_lineal) / 2
 unipredi$predi41 <- (unipredi$xgboost + unipredi$svm_polinomial) / 2
 unipredi$predi42 <- (unipredi$xgboost + unipredi$svm_rbf) / 2
 
-unipredi$predi43 <- (unipredi$logistica_mmpc + unipredi$rednnet + unipredi$bagging) / 3
-unipredi$predi44 <- (unipredi$logistica_mmpc + unipredi$rednnet + unipredi$rf) / 3
-unipredi$predi45 <- (unipredi$logistica_mmpc + unipredi$rednnet + unipredi$gbm) / 3
-unipredi$predi46 <- (unipredi$logistica_mmpc + unipredi$rednnet + unipredi$xgboost) / 3
-unipredi$predi47 <- (unipredi$logistica_mmpc + unipredi$rednnet + unipredi$svm_lineal) / 3
-unipredi$predi48 <- (unipredi$logistica_mmpc + unipredi$rednnet + unipredi$svm_polinomial) / 3
-unipredi$predi49 <- (unipredi$logistica_mmpc + unipredi$rednnet + unipredi$svm_rbf) / 3
-unipredi$predi50 <- (unipredi$logistica_mmpc + unipredi$bagging + unipredi$rf) / 3
-unipredi$predi51 <- (unipredi$logistica_mmpc + unipredi$bagging + unipredi$gbm) / 3
-unipredi$predi52 <- (unipredi$logistica_mmpc + unipredi$bagging + unipredi$xgboost) / 3
-unipredi$predi53 <- (unipredi$logistica_mmpc + unipredi$bagging + unipredi$svm_lineal) / 3
-unipredi$predi54 <- (unipredi$logistica_mmpc + unipredi$bagging + unipredi$svm_polinomial) / 3
-unipredi$predi55 <- (unipredi$logistica_mmpc + unipredi$bagging + unipredi$svm_rbf) / 3
-unipredi$predi56 <- (unipredi$logistica_mmpc + unipredi$rf + unipredi$gbm) / 3
-unipredi$predi57 <- (unipredi$logistica_mmpc + unipredi$rf + unipredi$xgboost) / 3
-unipredi$predi58 <- (unipredi$logistica_mmpc + unipredi$rf + unipredi$svm_lineal) / 3
-unipredi$predi59 <- (unipredi$logistica_mmpc + unipredi$rf + unipredi$svm_polinomial) / 3
-unipredi$predi60 <- (unipredi$logistica_mmpc + unipredi$rf + unipredi$svm_rbf) / 3
-unipredi$predi61 <- (unipredi$logistica_mmpc + unipredi$gbm + unipredi$xgboost) / 3
-unipredi$predi62 <- (unipredi$logistica_mmpc + unipredi$gbm + unipredi$svm_lineal) / 3
-unipredi$predi63 <- (unipredi$logistica_mmpc + unipredi$gbm + unipredi$svm_polinomial) / 3
-unipredi$predi64 <- (unipredi$logistica_mmpc + unipredi$gbm + unipredi$svm_rbf) / 3
-unipredi$predi65 <- (unipredi$logistica_mmpc + unipredi$xgboost + unipredi$svm_lineal) / 3
-unipredi$predi66 <- (unipredi$logistica_mmpc + unipredi$xgboost + unipredi$svm_polinomial) / 3
-unipredi$predi67 <- (unipredi$logistica_mmpc + unipredi$xgboost + unipredi$svm_rbf) / 3
+unipredi$predi43 <- (unipredi$logist_mmpc + unipredi$rednnet + unipredi$bagging) / 3
+unipredi$predi44 <- (unipredi$logist_mmpc + unipredi$rednnet + unipredi$rf) / 3
+unipredi$predi45 <- (unipredi$logist_mmpc + unipredi$rednnet + unipredi$gbm) / 3
+unipredi$predi46 <- (unipredi$logist_mmpc + unipredi$rednnet + unipredi$xgboost) / 3
+unipredi$predi47 <- (unipredi$logist_mmpc + unipredi$rednnet + unipredi$svm_lineal) / 3
+unipredi$predi48 <- (unipredi$logist_mmpc + unipredi$rednnet + unipredi$svm_polinomial) / 3
+unipredi$predi49 <- (unipredi$logist_mmpc + unipredi$rednnet + unipredi$svm_rbf) / 3
+unipredi$predi50 <- (unipredi$logist_mmpc + unipredi$bagging + unipredi$rf) / 3
+unipredi$predi51 <- (unipredi$logist_mmpc + unipredi$bagging + unipredi$gbm) / 3
+unipredi$predi52 <- (unipredi$logist_mmpc + unipredi$bagging + unipredi$xgboost) / 3
+unipredi$predi53 <- (unipredi$logist_mmpc + unipredi$bagging + unipredi$svm_lineal) / 3
+unipredi$predi54 <- (unipredi$logist_mmpc + unipredi$bagging + unipredi$svm_polinomial) / 3
+unipredi$predi55 <- (unipredi$logist_mmpc + unipredi$bagging + unipredi$svm_rbf) / 3
+unipredi$predi56 <- (unipredi$logist_mmpc + unipredi$rf + unipredi$gbm) / 3
+unipredi$predi57 <- (unipredi$logist_mmpc + unipredi$rf + unipredi$xgboost) / 3
+unipredi$predi58 <- (unipredi$logist_mmpc + unipredi$rf + unipredi$svm_lineal) / 3
+unipredi$predi59 <- (unipredi$logist_mmpc + unipredi$rf + unipredi$svm_polinomial) / 3
+unipredi$predi60 <- (unipredi$logist_mmpc + unipredi$rf + unipredi$svm_rbf) / 3
+unipredi$predi61 <- (unipredi$logist_mmpc + unipredi$gbm + unipredi$xgboost) / 3
+unipredi$predi62 <- (unipredi$logist_mmpc + unipredi$gbm + unipredi$svm_lineal) / 3
+unipredi$predi63 <- (unipredi$logist_mmpc + unipredi$gbm + unipredi$svm_polinomial) / 3
+unipredi$predi64 <- (unipredi$logist_mmpc + unipredi$gbm + unipredi$svm_rbf) / 3
+unipredi$predi65 <- (unipredi$logist_mmpc + unipredi$xgboost + unipredi$svm_lineal) / 3
+unipredi$predi66 <- (unipredi$logist_mmpc + unipredi$xgboost + unipredi$svm_polinomial) / 3
+unipredi$predi67 <- (unipredi$logist_mmpc + unipredi$xgboost + unipredi$svm_rbf) / 3
 unipredi$predi68 <- (unipredi$rf + unipredi$rednnet + unipredi$bagging) / 3
 unipredi$predi69 <- (unipredi$rf + unipredi$rednnet + unipredi$gbm) / 3
 unipredi$predi70 <- (unipredi$rf + unipredi$rednnet + unipredi$xgboost) / 3
@@ -2673,19 +2640,19 @@ unipredi$predi83 <- (unipredi$rf + unipredi$xgboost + unipredi$svm_lineal) / 3
 unipredi$predi84 <- (unipredi$rf + unipredi$xgboost + unipredi$svm_polinomial) / 3
 unipredi$predi85 <- (unipredi$rf + unipredi$xgboost + unipredi$svm_rbf) / 3
 
-unipredi$predi86 <- (unipredi$logistica_mmpc + unipredi$rf + unipredi$bagging + unipredi$xgboost) / 4
-unipredi$predi87 <- (unipredi$logistica_mmpc + unipredi$rf + unipredi$bagging + unipredi$gbm) / 4
+unipredi$predi86 <- (unipredi$logist_mmpc + unipredi$rf + unipredi$bagging + unipredi$xgboost) / 4
+unipredi$predi87 <- (unipredi$logist_mmpc + unipredi$rf + unipredi$bagging + unipredi$gbm) / 4
 unipredi$predi88 <- (unipredi$rf + unipredi$bagging + unipredi$xgboost + unipredi$gbm) / 4
 
-unipredi$predi89 <- (unipredi$logistica_mmpc + unipredi$rf + unipredi$bagging + unipredi$xgboost + unipredi$gbm) / 5
-unipredi$predi90 <- (unipredi$logistica_mmpc + unipredi$rf + unipredi$bagging + unipredi$xgboost + unipredi$rednnet) / 5
+unipredi$predi89 <- (unipredi$logist_mmpc + unipredi$rf + unipredi$bagging + unipredi$xgboost + unipredi$gbm) / 5
+unipredi$predi90 <- (unipredi$logist_mmpc + unipredi$rf + unipredi$bagging + unipredi$xgboost + unipredi$rednnet) / 5
 unipredi$predi91 <- (unipredi$rf + unipredi$bagging + unipredi$xgboost + unipredi$gbm + unipredi$rednnet) / 5
 
 
 # 5: PROCESADO DE LOS ENSAMBLADOS:
 ## Listado de modelos a considerar:
 
-listado <- c("logistica_mmpc", "rednnet", "bagging", "rf", "gbm",  "xgboost", "svm_lineal", "svm_polinomial",       "svm_rbf", "predi10", "predi11", "predi12", "predi13", "predi14", "predi15", "predi16", "predi17", "predi18",     "predi19", "predi20", "predi21", "predi22", "predi23", "predi24", "predi25", "predi26", "predi27", "predi28",     "predi29", "predi30", "predi31", "predi32", "predi33", "predi34", "predi35", "predi36", "predi37", "predi38",     "predi39", "predi40", "predi41", "predi42", "predi43", "predi44", "predi45", "predi46", "predi47", "predi48",     "predi49", "predi50", "predi51", "predi52", "predi53", "predi54", "predi55", "predi56", "predi57", "predi58",     "predi59", "predi60", "predi61", "predi62", "predi63", "predi64", "predi65", "predi66", "predi67", "predi68",     "predi69", "predi70", "predi71", "predi72", "predi73", "predi74", "predi75", "predi76", "predi77", "predi78",     "predi79", "predi80", "predi81", "predi82", "predi83", "predi84", "predi85", "predi86", "predi87", "predi88",     "predi89", "predi90", "predi91")
+listado <- c("logist_mmpc", "rednnet", "bagging", "rf", "gbm",  "xgboost", "svm_lineal", "svm_polinomial",       "svm_rbf", "predi10", "predi11", "predi12", "predi13", "predi14", "predi15", "predi16", "predi17", "predi18",     "predi19", "predi20", "predi21", "predi22", "predi23", "predi24", "predi25", "predi26", "predi27", "predi28",     "predi29", "predi30", "predi31", "predi32", "predi33", "predi34", "predi35", "predi36", "predi37", "predi38",     "predi39", "predi40", "predi41", "predi42", "predi43", "predi44", "predi45", "predi46", "predi47", "predi48",     "predi49", "predi50", "predi51", "predi52", "predi53", "predi54", "predi55", "predi56", "predi57", "predi58",     "predi59", "predi60", "predi61", "predi62", "predi63", "predi64", "predi65", "predi66", "predi67", "predi68",     "predi69", "predi70", "predi71", "predi72", "predi73", "predi74", "predi75", "predi76", "predi77", "predi78",     "predi79", "predi80", "predi81", "predi82", "predi83", "predi84", "predi85", "predi86", "predi87", "predi88",     "predi89", "predi90", "predi91")
 
 ## Defino funcion tasafallos y funcion auc:
 
@@ -2775,18 +2742,18 @@ Una vez se han graficado todos los modelos, nos quedamos con aquellos de interé
 ```{r eval = TRUE}
 # 9: GRÁFICOS BOXPLOT ELEGIDOS:
 
-listadobis <- c("logistica_mmpc", "rednnet", "bagging", "rf", "gbm", "xgboost", "svm_lineal", "svm_polinomial",             "svm_rbf", "predi12", "predi13", "predi14", "predi22", "predi26", "predi31", "predi36", "predi51", "predi56",             "predi57", "predi58", "predi61", "predi70", "predi71", "predi74", "predi79", "predi87", "predi88", "predi90",             "predi91")
+listadobis <- c("logist_mmpc", "rednnet", "bagging", "rf", "gbm", "xgboost", "svm_lineal", "svm_polinomial",             "svm_rbf", "predi12", "predi13", "predi14", "predi22", "predi26", "predi31", "predi36", "predi51", "predi56",             "predi57", "predi58", "predi61", "predi70", "predi71", "predi74", "predi79", "predi87", "predi88", "predi90",             "predi91")
 
 medias0$modelo <- as.character(medias0$modelo)
 
 mediasver <- medias0[medias0$modelo %in% listadobis, ]
 
 mediasver$modelo <- with(mediasver, reorder(modelo, tasa, mean))
-par(cex.axis = 0.9, las = 2)
+par(cex.axis = 0.6, las = 2)
 boxplot(data = mediasver, tasa ~ modelo, col = "pink", main =' TASA FALLOS')
 
 mediasver$modelo <- with(mediasver, reorder(modelo, auc, mean))
-par(cex.axis = 0.9, las = 2) 
+par(cex.axis = 0.6, las = 2) 
 boxplot(data = mediasver, auc ~ modelo, col = "pink", main = 'AUC')
 
 
@@ -2795,27 +2762,27 @@ boxplot(data = mediasver, auc ~ modelo, col = "pink", main = 'AUC')
 
 De nuevo, observando los dos gráficos boxplot se llega a la conclusión de que el modelo que se mejor ajusta a nuestros datos es el modelo predi51 puesto que es el que mejor balance establece entre una baja tasa de fallos, un alto AUC y una menor varianza de los resultados.   
 
-Es un modelo ensamblado, fruto del promedio de los modelos Logística (MMPC), Bagging y Gbm.  
+Es un modelo ensamblado, fruto del promedio de los modelos logist_mmpc, bagging y gbm.  
 
 Sin embargo, debido al bajo número de observaciones que tiene nuestra clase minoritaria de la variable objetivo, no podemos permitirnos modelos tan complejos como el predi51.   
 
-Por esta razón se prefiere optar por un modelo más sencillo con buenas características también. En este sentido, el modelo Logística (MMPC) se adecúa a nuestras exigencias.   
+Por esta razón se prefiere optar por un modelo más sencillo con buenas características también. En este sentido, el modelo logist_mmpc se adecúa a nuestras exigencias.   
 
 
 ## 18: Elección del mejor modelo.
 
-Una vez se han graficado todos los modelos y se han tenido en cuenta diferentes aspectos de estos tales como la tasa de fallos, AUC y varianza al estimar las predicciones, así como la complejidad del modelo, podemos concluir qué **el mejor modelo para nuestros datos es el modelo Logística (MMPC)**.   
+Una vez se han graficado todos los modelos y se han tenido en cuenta diferentes aspectos de estos tales como la tasa de fallos, AUC y varianza al estimar las predicciones, así como la complejidad del modelo, podemos concluir qué **el mejor modelo para nuestros datos es el modelo logist_mmpc**.   
 
 Las razones por las que se elige este modelo frente al resto se han ido comentando a lo largo del trabajo. De entre todos los modelos sin ensamblar, este modelo es el que mayor AUC presenta.   
 
-En cuanto a la tasa de fallos, aunque el modelo Logística (MMPC) no es el que menor tasa de fallos presenta en sus predicciones, la diferencia con respecto a otros modelos con menor tasa de fallos en sus predicciones no es grande, por lo que se prefiere un modelo con mayor AUC.   
+En cuanto a la tasa de fallos, aunque el modelo logist_mmpc no es el que menor tasa de fallos presenta en sus predicciones, la diferencia con respecto a otros modelos con menor tasa de fallos en sus predicciones no es grande, por lo que se prefiere un modelo con mayor AUC.   
 
-Por otra parte, aunque existen otros modelos ensamblados que presentan un AUC ligeramente mayor y una tasa de fallos menor al modelo Logística (MMPC), no compensa complicar la elección del modelo por una pequeña mejora. Además, el número de observaciones de nuestra clase minoritaria de la variable objetivo nos limita la elección del modelo a uno no demasiado complejo.    
+Por otra parte, aunque existen otros modelos ensamblados que presentan un AUC ligeramente mayor y una tasa de fallos menor al modelo logist_mmpc, no compensa complicar la elección del modelo por una pequeña mejora. Además, el número de observaciones de nuestra clase minoritaria de la variable objetivo nos limita la elección del modelo a uno no demasiado complejo.    
 
-Por todas estas razones, el modelo Logística (MMPC) es el que mejor se va a adaptar a nuestros datos.  
+Por todas estas razones, el modelo logist_mmpc es el que mejor se va a adaptar a nuestros datos.  
 
 
-Con estas explicaciones y en vista a los gráficos boxplot comentados durante todo el trabajo, **no se procede a realizar contraste de hipótesis entre ningún modelo**, puesto que se tiene certeza de que el modelo Logística (MMPC) es el mejor modelo.   
+Con estas explicaciones y en vista a los gráficos boxplot comentados durante todo el trabajo, **no se procede a realizar contraste de hipótesis entre ningún modelo**, puesto que se tiene certeza de que el modelo logist_mmpc es el mejor modelo.   
 
 
 ## 19: Características de nuestro modelo elegido.
@@ -2841,13 +2808,13 @@ confusionMatrix(reference = sal_modelo_elegido_logistica_mmpc$obs, data = sal_mo
   positive = "Yes")
 
 
-# Curva ROC:
+# AUC y Curva ROC:
 
 curvaroc_modelo_elegido_logistica_mmpc <- roc(response = sal_modelo_elegido_logistica_mmpc$obs, 
   predictor = sal_modelo_elegido_logistica_mmpc$Yes)
-auc_modelo_elegido_logistica_mmpc <- curvaroc_modelo_elegido_logistica_mmpc$auc
-auc_modelo_elegido_logistica_mmpc
-plot(roc(response = sal_modelo_elegido_logistica_mmpc$obs, predictor = sal_modelo_elegido_logistica_mmpc$Yes))
+curvaroc_modelo_elegido_logistica_mmpc$auc
+
+plot(curvaroc_modelo_elegido_logistica_mmpc)
 
   
 ```
@@ -2905,26 +2872,6 @@ Se observa una notable mejora en la sensibilidad a costa de un empeoramiento de 
 Paralelamente, se ve que la precisión de nuestro modelo ha disminuido ligeramente a un valor de 0.2973 ya que, al disminuir el punto de corte, ha disminuido la proporción de pacientes fallecidos clasificados correctamente sobre el total de pacientes identificados como fallecidos.    
 
 También nuestro Accuracy ha disminuido ya que hay menos pacientes totales clasificados correctamente.  
-
-
-Si se comparan ambos resultados en una tabla:  
-
-```{r eval = TRUE}
-# Tabla con características del modelo final escogido:
-
-tabla_8 <- as_tibble(cbind(Num_observaciones = rep(786, 2), Num_observaciones_clase_minoritaria = rep("139 (17.7%)", 2),
-  Modelo_elegido = rep("Logística (MMPC)", 2),  Variable_objetivo = rep("mortalidad", 2), 
-  Variables_predictoras = rep("edad, presion_arterial_sistolica, creatinina, sodio, crepitantes_no, inhibidores_ECA_si",
-  2), Num_variables_predictoras = rep(length(variables_mmpc), 2), Punto_corte = c(0.5, 0.2), Tasa_fallos = c(""),
-  AUC = rep(0.6896, 2), Sensibilidad = c(""), Especificidad = c(""), Accuracy = c(""),
-  Precision = c(""), Num_yes_predichos = c(""), VP = c(""), 
-  VN = c(""), FP = c(""), FN = c("")))
-
-tabla_8
-
-
-```
-
 
 Puesto que se considera más importante clasificar correctamente a aquellos pacientes que fallecen tras sufrir un infarto, **se propone cambiar el punto de corte a un valor de 0.2**.  
 
