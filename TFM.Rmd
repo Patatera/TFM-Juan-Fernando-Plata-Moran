@@ -1752,7 +1752,7 @@ rf_2
 ```
 
 
-Nos quedamos con mtry = 4 para 'Rf', para no concurrir en sobreajuste y establecer un número oportuno de variables en cada árbol generado.   
+Nos quedamos con mtry = 4 para 'Rf', para establecer un número oportuno de variables en cada árbol generado.   
 
 En siguiente lugar, vamos a decidir el mínimo número de ntree para 'Bagging':
 
@@ -2032,6 +2032,7 @@ plot(gbm)
 # Importancia de variables Gbm:
 
 tabla <- summary(gbm)
+tabla
 
 ggplot(tabla, aes(x = reorder(row.names(tabla), - rel.inf), y = rel.inf)) +
   geom_bar(stat = "identity", color = "black", fill = "grey", alpha = 0.8) +
@@ -2070,7 +2071,7 @@ plot(gbm_2)
 ```
 
 
-Aunque el entrenamiento nos ofrece como parámetros óptimos shrinkage = 0.05 y n.minobsinnode = 10, si miramos las gráficas obtenidas, parece más fiable elegir los parámetros shrinkage = 0.05 y n.minobsinnode = 20.  
+Aunque el entrenamiento nos ofrece como parámetros óptimos shrinkage = 0.05 y n.minobsinnode = 10, si miramos las gráficas obtenidas, parece más fiable elegir los parámetros shrinkage = 0.05 y n.minobsinnode = 20.   
 
 
 Vamos a hacer estudio de Early stopping para evitar un posible sobreajuste del parámetro n.trees:  
@@ -2099,7 +2100,7 @@ ggplot(gbm_3$results, aes(x = n.trees, y = Accuracy)) +
 ```
 
 
-Vemos que el Accuracy tiene varios máximos locales, por lo que finalmente nos quedamos con **shrinkage = 0.05, n.minobsinnode = 20 y n.trees = 75 para 'Gbm'**
+En vista de los resultados, finalmente nos quedamos con **shrinkage = 0.05, n.minobsinnode = 20 y n.trees = 75 para 'Gbm'**.
 
 
 ## 12: Comparación de modelos con Gbm.
@@ -2307,11 +2308,11 @@ set.seed(1234)
 SVM_lineal <- train(mortalidad ~ edad + presion_arterial_sistolica + creatinina + sodio + crepitantes_no +
   inhibidores_ECA_si, data = HF_prep, method = "svmLinear", trControl = trainControl(method = "repeatedcv", number = 4,
   repeats = 5, savePredictions = "all", classProbs = TRUE), 
-  tuneGrid = expand.grid(C = c(0.01, 0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 25, 30, 50)), verbose = FALSE)
+  tuneGrid = expand.grid(C = c(0.01, 0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 30, 50)), verbose = FALSE)
 
 SVM_lineal
 SVM_lineal$results
-#plot(SVM_lineal$results$C, SVM_lineal$results$Accuracy)
+
 ggplot(SVM_lineal$results, aes(x = factor(C), y = Accuracy)) +
   geom_point(position = position_dodge(width = 0.5), size = 3)
 
@@ -2341,6 +2342,7 @@ SVM_poly <- train(mortalidad ~ edad + presion_arterial_sistolica + creatinina + 
 
 SVM_poly
 SVM_poly$results
+
 ggplot(SVM_poly$results, aes(x = factor(C), y = Accuracy, pch = factor(scale))) +
   geom_point(position = position_dodge(width = 0.5), size = 3)
 
@@ -2370,6 +2372,7 @@ SVM_radial <- train(mortalidad ~ edad + presion_arterial_sistolica + creatinina 
 
 SVM_radial
 SVM_radial$results
+
 ggplot(SVM_radial$results, aes(x = factor(C), y = Accuracy, color = factor(sigma))) + 
   geom_point(position = position_dodge(width = 0.5), size = 3)
 
@@ -2988,10 +2991,3 @@ Por otra parte, la elección de un nuevo punto de corte nos proporciona unos res
 Con todo, las principales dificultades de partida son las limitaciones impuestas por las pocas observaciones de nuestra base de datos y, sobre todo, las escasas observaciones de la clase minoritaria de la variable objetivo.  
 
 En todo momento, se ha procurado seguir un razonamiento lógico combinando los resultados obtenidos con el sentido común. A su vez, se ha perseguido el entendimiento de todo proceso con el objetivo, entre otros, de poder aplicarlo a otros futuros proyectos. La implantación de otros posibles modelos alternativos tiene cabida en este trabajo, pudiendo complementar y aportar información adicional.   
-
-
-
-
-
-
-
