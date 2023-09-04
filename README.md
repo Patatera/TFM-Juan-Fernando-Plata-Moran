@@ -13,5 +13,7 @@ Los archivos importados son los siguientes:
 
 3. SAS Enterprise Miner: Carpeta con los archivos usados en SAS Enterprise Miner.
 
-    2.1. 
+   2.1. HF_prep_TFM.csv: Base de datos importada en SAS Enterprise Miner, en el nodo "Importar archivo".
+
+   2.2. TFM_SAS.zip: Carpeta comprimida para visualizar el diagrama de flujo y el procedimiento llevado a cabo en SAS Enterprise Miner. Es necesario descomprimir la carpeta para visualizar los resultados.
 
