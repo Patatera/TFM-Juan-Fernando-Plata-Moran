@@ -2308,7 +2308,7 @@ set.seed(1234)
 SVM_lineal <- train(mortalidad ~ edad + presion_arterial_sistolica + creatinina + sodio + crepitantes_no +
   inhibidores_ECA_si, data = HF_prep, method = "svmLinear", trControl = trainControl(method = "repeatedcv", number = 4,
   repeats = 5, savePredictions = "all", classProbs = TRUE), 
-  tuneGrid = expand.grid(C = c(0.01, 0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 30, 50)), verbose = FALSE)
+  tuneGrid = expand.grid(C = c(0.01, 0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 25, 30, 50)), verbose = FALSE)
 
 SVM_lineal
 SVM_lineal$results
